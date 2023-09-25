@@ -1,0 +1,365 @@
+---
+openapi: 3.0.0
+info:
+  title: Exchange Rate
+  description: ""
+  termsOfService: https://openweathermap.org/terms
+  contact:
+    name: FreecurrencyAPI
+    url: https://api.freecurrencyapi.com
+  version: 1.0.0
+externalDocs:
+  description: API Documentation
+  url: https://freecurrencyapi.com/docs/currencies#request-parameters
+servers:
+- url: https://api.freecurrencyapi.com/v1/
+  description: Production server
+security:
+- apikey: []
+paths:
+  /latest:
+    get:
+      tags:
+      - Live Exchange
+      summary: Get the most recent exchange rate data
+      parameters:
+      - name: base_currency
+        in: query
+        description: "**Базовая валюта**. *Пример: RUB*. Базовая валюта, по отношению к которой отображаются все результаты.По умолчанию все значения указаны в долларах США. Список кодов валют. [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: currencies
+        in: query
+        description: "**Список валют**. *Пример: USD, EUR*. Список валют, разделенных запятыми без пробелов, которые вы хотите получить (EUR,USD,CAD) По умолчанию будут показаны все доступные валюты. Список кодов валют [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/last'
+        "403":
+          description: "You are not allowed to use this endpoint, please upgrade your plan [here](https://app.freecurrencyapi.com/subscription)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "404":
+          description: A requested endpoint does not exist
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "422":
+          description: "Validation error, please check the list of validation errors: [here](https://freecurrencyapi.com/docs/status-codes#validation-errors)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+  /historical:
+    get:
+      tags:
+      - Historical Exchange Rates
+      summary: Returns exchange rates for a given time range.
+      description: Возвращает обменные курсы за заданный временной диапазон. Предоставляем данные от 1999 году.
+      parameters:
+      - name: date_from
+        in: query
+        description: "**Дата начала** получения исторических ставок (формат: 2021-12-31)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: date_to
+        in: query
+        description: "**Дата окончания** для получения исторических ставок (формат: 2021-12-31)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: base_currency
+        in: query
+        description: "**Базовая валюта**. *Пример: RUB*. Базовая валюта, по отношению к которой отображаются все результаты.По умолчанию все значения указаны в долларах США. Список кодов валют. [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: currencies
+        in: query
+        description: "**Список валют**. *Пример: USD, EUR*. Список валют, разделенных запятыми без пробелов, которые вы хотите получить (EUR,USD,CAD) По умолчанию будут показаны все доступные валюты. Список кодов валют [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/historical'
+        "403":
+          description: "You are not allowed to use this endpoint, please upgrade your plan [here](https://app.freecurrencyapi.com/subscription)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "404":
+          description: A requested endpoint does not exist
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "422":
+          description: "Validation error, please check the list of validation errors: [here](https://freecurrencyapi.com/docs/status-codes#validation-errors)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+  /status:
+    get:
+      tags:
+      - Status
+      summary: Returns your current quota
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/status'
+        "403":
+          description: "You are not allowed to use this endpoint, please upgrade your plan [here](https://app.freecurrencyapi.com/subscription)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "404":
+          description: A requested endpoint does not exist
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "422":
+          description: "Validation error, please check the list of validation errors: [here](https://freecurrencyapi.com/docs/status-codes#validation-errors)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+  /currencies:
+    get:
+      tags:
+      - Currencies
+      summary: Returns all our supported currencies
+      parameters:
+      - name: currencies
+        in: query
+        description: "**Список валют**. *Пример: USD, EUR*. Список валют, разделенных запятыми без пробелов, которые вы хотите получить (EUR,USD,CAD) По умолчанию будут показаны все доступные валюты. Список кодов валют [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/currencies'
+        "403":
+          description: "You are not allowed to use this endpoint, please upgrade your plan [here](https://app.freecurrencyapi.com/subscription)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "404":
+          description: A requested endpoint does not exist
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+        "422":
+          description: "Validation error, please check the list of validation errors: [here](https://freecurrencyapi.com/docs/status-codes#validation-errors)"
+          content:
+            text/plain:
+              schema:
+                title: Rate not found
+                type: string
+components:
+  schemas:
+    last:
+      title: Successful response
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/meta'
+        data:
+          type: string
+          description: "Содержит полезную информацию, такую как дата и время последнего обновления, чтобы вы знали, что этот набор данных был обновлен в последний раз."
+          example: "AED: 3.67306"
+    meta:
+      title: meta
+      type: object
+      properties:
+        last_updated_at:
+          type: string
+          description: datetime to let you know then this dataset was last updated.
+          format: date-time
+          example: 2022-01-01T23:59:59Z
+    historical:
+      title: Successful response
+      type: object
+      properties:
+        data:
+          type: string
+          description: datetime to let you know then this dataset was last updated.
+          format: date-time
+          example: 2022-01-01T23:59:59Z
+    status:
+      title: Successful response
+      type: object
+      properties:
+        account_id:
+          type: integer
+        quotas:
+          $ref: '#/components/schemas/quotas'
+    quotas:
+      title: quotas
+      type: object
+      properties:
+        month:
+          $ref: '#/components/schemas/month'
+    month:
+      title: quotas
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 300
+        used:
+          type: integer
+          example: 71
+        remaining:
+          type: integer
+          example: 229
+    currencies:
+      title: Successful response
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/data'
+    data:
+      title: data
+      type: object
+      properties:
+        currencies:
+          $ref: '#/components/schemas/currency'
+    currency:
+      title: currency
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: AED
+        name:
+          type: string
+          example: United Arab Emirates Dirham
+        symbol_native:
+          type: string
+          example: د.إ
+        decimal_digits:
+          type: integer
+          example: 2
+        rounding:
+          type: integer
+        code:
+          type: string
+          example: AED
+        name_plural:
+          type: string
+          example: UAE dirhams
+  parameters:
+    base_currency:
+      name: base_currency
+      in: query
+      description: "**Базовая валюта**. *Пример: RUB*. Базовая валюта, по отношению к которой отображаются все результаты.По умолчанию все значения указаны в долларах США. Список кодов валют. [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    currencies:
+      name: currencies
+      in: query
+      description: "**Список валют**. *Пример: USD, EUR*. Список валют, разделенных запятыми без пробелов, которые вы хотите получить (EUR,USD,CAD) По умолчанию будут показаны все доступные валюты. Список кодов валют [здесь](https://freecurrencyapi.com/docs/currency-list/)"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+    date_from:
+      name: date_from
+      in: query
+      description: "**Дата начала** получения исторических ставок (формат: 2021-12-31)"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date-time
+    date_to:
+      name: date_to
+      in: query
+      description: "**Дата окончания** для получения исторических ставок (формат: 2021-12-31)"
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date-time
+    mode:
+      name: mode
+      in: query
+      description: "**Режим**. *Пример: html*. Определяет формат ответа. Возможными значениями являются `xml` и `html`. Если параметр mode пуст, то по умолчанию используется формат `json`."
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        default: json
+        enum:
+        - json
+        - xml
+        - html
+  securitySchemes:
+    apikey:
+      type: apiKey
+      description: "Ключ API для авторизации запросов. Если у вас нет ключа API Weather, используйте `."
+      name: apikey
+      in: query
